@@ -1,1 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f17;
+            color: #f1f5f9;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        /* Glassmorphism & Visual depth elements */
+        .card-dark {
+            background: linear-gradient(135deg, rgba(21, 28, 44, 0.7) 0%, rgba(15, 20, 32, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+        }
+        .card-dark-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-dark-hover:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .glow-teal {
+            box-shadow: 0 0 20px -5px rgba(45, 212, 191, 0.3);
+        }
+        .glow-pink {
+            box-shadow: 0 0 20px -5px rgba(244, 114, 182, 0.3);
+        }
+        .purple-gradient-card {
+            background: linear-gradient(135deg, rgba(53, 29, 79, 0.6) 0%, rgba(20, 19, 38, 0.9) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
 
