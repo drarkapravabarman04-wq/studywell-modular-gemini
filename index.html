@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studywell - MBBS Year One Learning Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="min-h-screen flex text-slate-100 antialiased selection:bg-teal-500 selection:text-slate-900">
+    <aside class="w-64 bg-[#090d14] border-r border-slate-800/80 p-5 flex flex-col justify-between shrink-0 hidden md:flex min-h-screen sticky top-0">
+        <div>
+            <div class="flex items-center gap-3 px-2 py-3 mb-8">
+                <div class="w-10 h-10 rounded-xl bg-teal-200 text-slate-900 flex items-center justify-center font-extrabold text-xl shadow-lg shadow-teal-500/20">
+                    <i data-lucide="sparkles" class="w-6 h-6 text-emerald-900"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none tracking-tight text-white">Studywell</h1>
+                    <span class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">MBBS · YEAR ONE</span>
+                </div>
+            </div>
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 mb-3">Your Space</div>
+            <nav class="space-y-1">
+                <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 bg-slate-800/80 text-white shadow-sm border border-slate-700/50">
+                    <i data-lucide="home" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Overview</span>
+                </button>
+                <button onclick="switchTab('curriculum')" id="nav-curriculum" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/40">
+                    <i data-lucide="book-open" class="w-4 h-4 text-emerald-400"></i>
+                    <span>My curriculum</span>
+                </button>
+                <button onclick="switchTab('ics')" id="nav-ics" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/40">
+                    <i data-lucide="asterisk" class="w-4 h-4 text-indigo-400"></i>
+                    <span>ICS course</span>
+                </button>
+                <button onclick="switchTab('exams')" id="nav-exams" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/40">
+                    <i data-lucide="clock" class="w-4 h-4 text-teal-400"></i>
+                    <span>Exams</span>
+                </button>
+            </nav>
+        </div>
+        <div class="card-dark p-4 rounded-2xl border border-slate-800/80">
+            <h4 class="text-xs font-bold text-slate-200 mb-1">Small steps, steady recall.</h4>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Make space for important work before the day fills up.</p>
+        </div>
+    </aside>
+    <main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto overflow-x-hidden">
+        <header class="flex justify-between items-center mb-6">
+            <div class="md:hidden flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-teal-300 text-slate-900 flex items-center justify-center font-bold">S</div>
+                <span class="font-bold text-lg">Studywell</span>
+            </div>
+            <div class="hidden md:block"></div>
+            <div class="flex items-center gap-4">
+                <span class="text-xs font-semibold text-slate-400" id="current-date-display">Sun, Oct 18</span>
+                <button onclick="openModal('add-topic-modal')" class="bg-teal-300 hover:bg-teal-200 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all duration-150 shadow-md shadow-teal-500/10">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add topic
+                </button>
+            </div>
+        </header>
+        <section id="tab-overview" class="tab-content space-y-8">
+            <div>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight">Good morning.</h1>
+                <p class="text-xs text-slate-400 mt-1">A little progress, thoughtfully chosen.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="lg:col-span-2 card-dark rounded-2xl p-6 border border-slate-800/80">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-sm text-slate-200">Today, at a glance</h3>
+                        <span class="text-[11px] font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800/50 px-2.5 py-0.5 rounded-full" id="due-count-badge">0 due today</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <div class="text-3xl font-extrabold text-teal-400" id="stat-topics-review">0</div>
+                            <div class="text-[11px] text-slate-400 mt-1">topics due for review</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-extrabold text-white" id="stat-topics-plan">0</div>
+                            <div class="text-[11px] text-slate-400 mt-1">topics in your plan</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-extrabold text-white" id="stat-ics-logged">0h</div>
+                            <div class="text-[11px] text-slate-400 mt-1">ICS practice logged</div>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-slate-800/60 text-xs text-slate-500 flex items-center justify-between">
+                        <span>Add a topic to start your review rhythm.</span>
+                        <button onclick="openModal('add-topic-modal')" class="text-teal-400 hover:underline font-medium">Add topic →</button>
+                    </div>
+                </div>
+                <div class="card-dark rounded-2xl p-6 border border-slate-800/80 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-900/90 to-indigo-950/30">
+                    <div>
+                        <div class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase mb-3">UP NEXT · EXAM COUNTDOWN</div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-5xl font-extrabold text-white tracking-tight" id="overview-days-countdown">88</span>
+                            <span class="text-slate-400 text-sm font-medium">days to go</span>
+                        </div>
+                        <div class="text-sm font-semibold text-slate-200 mt-3" id="overview-next-exam-title">1st Internal Assessment</div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800/60 flex items-center justify-between text-xs">
+                        <button onclick="switchTab('exams')" class="text-teal-400 hover:text-teal-300 font-medium flex items-center gap-1">
+                            View exams <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <i data-lucide="sun" class="w-8 h-8 text-slate-700"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Task prioritization</h2>
+                    <p class="text-xs text-slate-400">Place each task in the square that fits</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card-dark rounded-2xl p-5 border border-slate-800/80 relative min-h-[140px]">
+                        <span class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">URGENT & IMPORTANT</span>
+                        <div id="urgent-important-list" class="mt-3 space-y-2">
+                            <div class="text-xs text-slate-500 italic">No urgent tasks pinned. Focus on scheduled active recall!</div>
+                        </div>
+                    </div>
+                    <div class="card-dark rounded-2xl p-5 border border-slate-800/80 relative min-h-[140px]">
+                        <span class="text-[10px] font-bold tracking-widest text-slate-500 uppercase">NOT URGENT & IMPORTANT</span>
+                        <div id="not-urgent-list" class="mt-3 space-y-2">
+                            <div class="text-xs text-slate-500 italic">Add topics to long-term spaced repetition schedule.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-white">Your subjects</h2>
+                    <button onclick="switchTab('curriculum')" class="text-teal-400 hover:underline text-xs font-semibold">Open curriculum →</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="overview-subjects-grid">
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-lg font-bold text-white">Adaptive Review Schedule</h2>
+                        <span class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase">Spaced Repetition</span>
+                    </div>
+                    <button onclick="switchTab('curriculum')" class="text-teal-400 hover:underline text-xs font-semibold">View all →</button>
+                </div>
+                <div id="overview-review-queue" class="space-y-3">
+                </div>
+            </div>
+        </section>
+        <section id="tab-curriculum" class="tab-content hidden space-y-6">
+            <div id="curriculum-main-view" class="space-y-6">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white tracking-tight">My curriculum</h1>
+                    <p class="text-xs text-slate-400 mt-1">Build your own map, one unit and topic at a time.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="curriculum-subjects-grid">
+                </div>
+                <div class="space-y-4 pt-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-white">All topics</h2>
+                        <span class="text-xs text-slate-500 font-semibold" id="total-topics-count">0 total</span>
+                    </div>
+                    <div id="topics-container" class="space-y-3">
+                        <div class="card-dark rounded-2xl p-12 text-center text-slate-400 text-xs border border-dashed border-slate-800">
+                            No topics yet. Add a unit, chapter or topic you want to study.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="curriculum-subject-detail-view" class="hidden space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                    <button onclick="closeSubjectDetail()" class="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl transition">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Curriculum
+                    </button>
+                    <span class="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider text-slate-300 bg-slate-800 border border-slate-700" id="detail-subject-badge">Anatomy</span>
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-white tracking-tight" id="detail-subject-title">Anatomy Overview</h1>
+                        <p class="text-xs text-slate-400 mt-1">Chapters and topics categorized for this subject.</p>
+                    </div>
+                    <button onclick="openModalWithSubject()" class="bg-teal-300 hover:bg-teal-200 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Topic to Subject
+                    </button>
+                </div>
+                <div id="subject-chapters-container" class="space-y-6 pt-2">
+                </div>
+            </div>
+        </section>
+        <section id="tab-ics" class="tab-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white tracking-tight">ICS course</h1>
+                    <p class="text-xs text-slate-400 mt-1">Learn one technique, then give it room to become a habit.</p>
+                </div>
+                <button onclick="openModal('log-technique-modal')" class="bg-teal-300 hover:bg-teal-200 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-md shadow-teal-500/10 self-start md:self-auto">
+                    Log technique time ↓
+                </button>
+            </div>
+            <div class="card-dark rounded-3xl p-6 border border-teal-500/30 bg-gradient-to-br from-slate-900 via-slate-900 to-teal-950/20 space-y-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="bg-teal-950 text-teal-300 border border-teal-800/60 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                            Interactive Tool
+                        </span>
+                        <h2 class="text-xl font-bold text-white mt-2">Spaced Repetition Interval Simulator</h2>
+                        <p class="text-xs text-slate-400 mt-1">Experiment with mastery ratings to see how the mathematical adaptive engine calculates the next review date.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-1">Current Interval (Days)</label>
+                            <input type="number" id="sim-current-interval" min="1" max="180" value="3" oninput="runIntervalSimulator()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-300 block mb-2">How well did you retain it?</label>
+                            <div class="space-y-2" id="sim-rating-options">
+                                <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                    <input type="radio" name="sim-rating" value="poor" onchange="runIntervalSimulator()" class="text-rose-500 focus:ring-rose-500">
+                                    <div>
+                                        <div class="text-xs font-bold text-rose-400">Poor (×0.4)</div>
+                                        <div class="text-[10px] text-slate-400">Struggled to recall or had severe gaps</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                    <input type="radio" name="sim-rating" value="average" onchange="runIntervalSimulator()" class="text-amber-500 focus:ring-amber-500">
+                                    <div>
+                                        <div class="text-xs font-bold text-amber-400">Average (×0.7)</div>
+                                        <div class="text-[10px] text-slate-400">Remembered main ideas with hints/gaps</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                    <input type="radio" name="sim-rating" value="good" checked onchange="runIntervalSimulator()" class="text-sky-500 focus:ring-sky-500">
+                                    <div>
+                                        <div class="text-xs font-bold text-sky-400">Good (×1.7)</div>
+                                        <div class="text-[10px] text-slate-400">Recalled most ideas with reasonable confidence</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                    <input type="radio" name="sim-rating" value="perfect" onchange="runIntervalSimulator()" class="text-emerald-500 focus:ring-emerald-500">
+                                    <div>
+                                        <div class="text-xs font-bold text-emerald-400">Perfect (×2.5)</div>
+                                        <div class="text-[10px] text-slate-400">Accurate, independent, and effortless recall</div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-950 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+                                    <input type="radio" name="sim-rating" value="skip" onchange="runIntervalSimulator()" class="text-slate-400 focus:ring-slate-400">
+                                    <div>
+                                        <div class="text-xs font-bold text-slate-400">Skip (No Change)</div>
+                                        <div class="text-[10px] text-slate-500">Postponed session; preserves rating & interval</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/80 rounded-2xl p-6 border border-slate-800/80 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">SIMULATED RESULT</span>
+                            <div class="text-xs text-slate-400 mb-1">Calculated Next Interval:</div>
+                            <div class="text-4xl font-extrabold text-teal-300" id="sim-next-interval">5 days</div>
+                            <div class="text-xs text-slate-400 mt-3 leading-relaxed" id="sim-formula-explanation">
+                                Multiplier applied: <strong class="text-white">×1.7</strong>. Rounded from <span class="text-slate-300">5.1</span> days.
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 italic">
+                            Formula: $I_{\text{next}} = \operatorname{clamp}(I_{\text{current}} \times M, 1, 180)$
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-dark rounded-3xl p-6 border border-indigo-500/20 bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 relative overflow-hidden">
+                <div class="flex flex-col lg:flex-row justify-between gap-8">
+                    <div class="flex-1 space-y-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="bg-purple-900/60 text-purple-300 text-[10px] font-extrabold px-3 py-1 rounded-full border border-purple-700/50 uppercase tracking-wide">
+                                    Diagnostic assessment
+                                </span>
+                                <h2 class="text-xl font-bold text-white mt-3">My diagnostic results</h2>
+                                <p class="text-xs text-slate-400 mt-1">Check in with how you learn today. Your results are a starting point, not a grade.</p>
+                            </div>
+                            <span class="bg-slate-800/80 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-lg border border-slate-700">
+                                Profile updated
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-lime-400/20 text-lime-400 flex items-center justify-center font-bold text-xs">✂</div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Deep processing</div>
+                                        <div class="text-[10px] text-slate-400">Level 3 · ●●●○</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-xs">⚙</div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Self-regulation</div>
+                                        <div class="text-[10px] text-slate-400">Level 2 · ●●○○</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-sky-400/20 text-sky-400 flex items-center justify-center font-bold text-xs">⟲</div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Retrieval</div>
+                                        <div class="text-[10px] text-slate-400">Level 2 · ●●○○</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-teal-400/20 text-teal-400 flex items-center justify-center font-bold text-xs">☘</div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white">Mindset</div>
+                                        <div class="text-[10px] text-slate-400">Level 3 · ●●●○</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-2 flex items-center gap-3">
+                            <button onclick="openModal('assessment-modal')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition">
+                                Retake assessment
+                            </button>
+                            <span class="text-[11px] text-slate-500" id="assessment-last-completed">Last completed · October 18, 2026</span>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-80 h-72 flex flex-col items-center justify-center bg-slate-950/40 rounded-2xl p-3 border border-slate-800">
+                        <div class="text-[11px] font-bold text-slate-400 mb-2">Skill profile</div>
+                        <div class="w-full h-56 relative">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="purple-gradient-card rounded-3xl p-6 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 bg-purple-900/80 text-purple-200 text-[11px] font-bold px-3 py-1 rounded-full border border-purple-600/40 mb-3">
+                            <span>🧠</span> ICS Meta-Learning Course
+                        </span>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Meta-Learning Lab & 1:5 Ratio Monitor</h2>
+                        <p class="text-xs text-slate-300 max-w-2xl mt-2 leading-relaxed">
+                            Cognitive mastery requires a <strong class="text-white">1:5 theory-to-practice ratio</strong> (up to 40 hours practice per skill). Limit learning new study techniques to under <strong class="text-white">1 hour per day</strong>, and apply your techniques directly to MBBS topics.
+                        </p>
+                    </div>
+                    <button onclick="openModal('log-session-modal')" class="bg-sky-500/80 hover:bg-sky-400 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 border border-sky-400/30 shadow-lg shadow-sky-500/20 shrink-0">
+                        <i data-lucide="clock" class="w-4 h-4"></i> Log Study / Practice Session
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">CURRENT RATIO</span>
+                            <i data-lucide="chess-pawn" class="w-4 h-4 text-sky-400"></i>
+                        </div>
+                        <div class="text-3xl font-black text-white" id="kpi-ratio">1 : 0</div>
+                        <div class="text-[11px] text-slate-400 mt-1">Target: 1 : 5.0 (Theory to Practice)</div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+                            <div class="bg-sky-400 h-full rounded-full transition-all duration-300" id="kpi-ratio-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="text-[10px] text-slate-500 text-right mt-1" id="kpi-ratio-percent">0% of target ratio reached</div>
+                    </div>
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">TOTAL THEORY TIME</span>
+                            <i data-lucide="book" class="w-4 h-4 text-teal-400"></i>
+                        </div>
+                        <div class="text-3xl font-black text-white"><span id="kpi-theory-hours">0.5</span> <span class="text-base font-medium text-slate-400">hours</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1" id="kpi-theory-mins-desc">30 total minutes in video/theory</div>
+                        <div class="pt-3 border-t border-slate-800/80 mt-2 text-[10px] text-slate-400">
+                            Today: <span id="kpi-today-theory">30 min</span> (Max 60 min)
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">DELIBERATE PRACTICE</span>
+                            <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+                        </div>
+                        <div class="text-3xl font-black text-white"><span id="kpi-practice-hours">0.0</span> <span class="text-base font-medium text-slate-400">hours</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1">Applied directly to MBBS curriculum</div>
+                        <div class="pt-3 border-t border-slate-800/80 mt-2 text-[10px] text-slate-400">
+                            Target: <span id="kpi-target-practice">2.5 hrs</span> for 1:5 balance
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">PRACTICE DEBT / SURPLUS</span>
+                            <i data-lucide="activity" class="w-4 h-4 text-rose-400"></i>
+                        </div>
+                        <div class="text-3xl font-black text-amber-400" id="kpi-debt">-2.5 <span class="text-base font-medium text-amber-400">hrs</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1" id="kpi-debt-desc">2h 30m practice needed to restore 1:5 ratio</div>
+                        <div class="pt-3 border-t border-slate-800/80 mt-2 text-[10px] text-slate-500 italic">
+                            Prevents technique hoarding
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-dark rounded-3xl p-6 border border-slate-800/80 space-y-6">
+                <div>
+                    <span class="bg-slate-800 text-teal-400 text-[10px] font-bold px-3 py-1 rounded-full border border-slate-700 tracking-wider">
+                        ACTIVE STAGE
+                    </span>
+                    <h2 class="text-2xl font-extrabold text-white mt-3">Fundamental 1: Build an Effective Retrieval Method</h2>
+                    <p class="text-xs text-slate-300 mt-2 leading-relaxed max-w-4xl">
+                        Fundamental 1 establishes the bedrock of cognitive efficiency. It teaches how to use the <strong class="text-white">spacing effect correctly</strong>, maximizing retention and the effectiveness of retrieval practice using <strong class="text-white">interleaving</strong>, deploying <strong class="text-white">declarative versus procedural interleaving methods</strong> for different topic types, and tracking and targeting skill development using the <strong class="text-white">marginal gains framework</strong>.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-bold text-[10px] px-2.5 py-1 rounded-lg uppercase">SIR</span>
+                                <span class="bg-slate-800 text-slate-400 text-[11px] px-2.5 py-0.5 rounded-md font-medium" id="badge-sir">Novice (0h)</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-base">S-I-R Framework (Spaced Repetition, Interleaving, Retrieval)</h3>
+                                <p class="text-[11px] text-slate-400 mt-1">Fundamental 1: Build an effective retrieval method</p>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Core methodology combining the spacing effect, effortful active recall without notes, and interleaved practice to maximize long-term retention.
+                            </p>
+                            <div class="pt-3 border-t border-slate-800/80 space-y-2">
+                                <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase block">CORE PRINCIPLES:</span>
+                                <ul class="text-xs text-slate-300 space-y-2">
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Use spacing effect correctly: adjust intervals dynamically based on recall performance</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Effortful retrieval practice: close books and sketch/explain before checking reference notes</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Test true recall vs familiar recognition to avoid illusion of competence</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 space-y-3">
+                            <div class="flex justify-between text-xs text-slate-400 font-medium">
+                                <span>Theory: <strong class="text-white" id="sir-theory-time">0.5h</strong></span>
+                                <span>Practice: <strong class="text-white" id="sir-practice-time">0.0h</strong></span>
+                                <span class="text-slate-500" id="sir-ratio">1:0.0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="sir-input-mins" placeholder="Minutes" class="w-20 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                                <button onclick="logQuickTime('SIR', 'theory')" class="flex-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/50 py-1.5 rounded-lg text-xs font-bold transition">Log Theory</button>
+                                <button onclick="logQuickTime('SIR', 'practice')" class="flex-1 bg-sky-950/80 hover:bg-sky-900 text-sky-200 border border-sky-700/50 py-1.5 rounded-lg text-xs font-bold transition">Log Practice</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-bold text-[10px] px-2.5 py-1 rounded-lg uppercase">INTERLEAVING</span>
+                                <span class="bg-slate-800 text-slate-400 text-[11px] px-2.5 py-0.5 rounded-md font-medium" id="badge-interleaving">Novice (0h)</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Interleaving (Declarative vs Procedural)</h3>
+                                <p class="text-[11px] text-slate-400 mt-1">Fundamental 1: Build an effective retrieval method</p>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Maximizing retention by alternating between topic types using declarative and procedural interleaving methods.
+                            </p>
+                            <div class="pt-3 border-t border-slate-800/80 space-y-2">
+                                <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase block">CORE PRINCIPLES:</span>
+                                <ul class="text-xs text-slate-300 space-y-2">
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Declarative interleaving: alternate across sub-disciplines (e.g. Anatomy relations + Physiology mechanisms)</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Procedural interleaving: practice mixed clinical scenarios and diagnostic trees out of sequence</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Embrace perceived difficulty: interleaving feels slower initially but yields substantially higher exam retention</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 space-y-3">
+                            <div class="flex justify-between text-xs text-slate-400 font-medium">
+                                <span>Theory: <strong class="text-white" id="interleaving-theory-time">0.0h</strong></span>
+                                <span>Practice: <strong class="text-white" id="interleaving-practice-time">0.0h</strong></span>
+                                <span class="text-slate-500" id="interleaving-ratio">1:0.0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="interleaving-input-mins" placeholder="Minutes" class="w-20 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                                <button onclick="logQuickTime('Interleaving', 'theory')" class="flex-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/50 py-1.5 rounded-lg text-xs font-bold transition">Log Theory</button>
+                                <button onclick="logQuickTime('Interleaving', 'practice')" class="flex-1 bg-sky-950/80 hover:bg-sky-900 text-sky-200 border border-sky-700/50 py-1.5 rounded-lg text-xs font-bold transition">Log Practice</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-bold text-[10px] px-2.5 py-1 rounded-lg uppercase">MARGINAL_GAINS</span>
+                                <span class="bg-slate-800 text-slate-400 text-[11px] px-2.5 py-0.5 rounded-md font-medium" id="badge-marginal">Novice (0h)</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-base">Marginal Gains Framework</h3>
+                                <p class="text-[11px] text-slate-400 mt-1">Fundamental 1: Build an effective retrieval method</p>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Tracking and targeting skill development systematically to achieve continuous micro-improvements in study efficiency.
+                            </p>
+                            <div class="pt-3 border-t border-slate-800/80 space-y-2">
+                                <span class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase block">CORE PRINCIPLES:</span>
+                                <ul class="text-xs text-slate-300 space-y-2">
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Isolate specific micro-skills (e.g., speed of drawing schema, accuracy of self-testing)</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Track efficiency gains over time rather than raw hours spent</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i data-lucide="check" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                                        <span>Target weakest retention areas instead of repeatedly reviewing comfortable material</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 space-y-3">
+                            <div class="flex justify-between text-xs text-slate-400 font-medium">
+                                <span>Theory: <strong class="text-white" id="marginal-theory-time">0.0h</strong></span>
+                                <span>Practice: <strong class="text-white" id="marginal-practice-time">0.0h</strong></span>
+                                <span class="text-slate-500" id="marginal-ratio">1:0.0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="marginal-input-mins" placeholder="Minutes" class="w-20 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                                <button onclick="logQuickTime('Marginal Gains', 'theory')" class="flex-1 bg-indigo-950/80 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/50 py-1.5 rounded-lg text-xs font-bold transition">Log Theory</button>
+                                <button onclick="logQuickTime('Marginal Gains', 'practice')" class="flex-1 bg-sky-950/80 hover:bg-sky-900 text-sky-200 border border-sky-700/50 py-1.5 rounded-lg text-xs font-bold transition">Log Practice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-extrabold text-white">Session history</h2>
+                    <span class="text-xs text-slate-400 font-medium">Most recent first</span>
+                </div>
+                <div id="session-history-container" class="space-y-2">
+                    <div class="card-dark rounded-2xl p-4 flex items-center justify-between border border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-200/10 text-amber-300 flex items-center justify-center font-bold text-lg">
+                                📖
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-white">S-I-R Framework (Spaced Repetition, Interleaving, Retrieval)</h4>
+                                <div class="text-[11px] text-slate-400 mt-0.5">SIR · Theory · Oct 18</div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-slate-200 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">30 min</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="tab-exams" class="tab-content hidden space-y-8">
+            <div class="purple-gradient-card rounded-3xl p-6 border border-rose-500/20 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="inline-flex items-center gap-1.5 bg-rose-950 text-rose-300 text-[11px] font-bold px-3 py-1 rounded-full border border-rose-800/50 mb-3">
+                            <span>♠</span> Milestone Readiness Engine
+                        </span>
+                        <h1 class="text-3xl font-extrabold text-white tracking-tight">MBBS Exam Countdown & Syllabus Preparedness</h1>
+                        <p class="text-xs text-slate-300 mt-2 max-w-2xl leading-relaxed">
+                            Track time remaining until your exams and balance adaptive revisions so no topics are left unlearned on exam day.
+                        </p>
+                    </div>
+                    <button onclick="openModal('add-exam-modal')" class="bg-rose-500 hover:bg-rose-400 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-lg shadow-rose-500/20 shrink-0">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Exam Target
+                    </button>
+                </div>
+            </div>
+            <div class="card-dark rounded-2xl p-6 border border-slate-800/80 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i data-lucide="target" class="w-4 h-4 text-teal-400"></i> Curriculum Readiness Breakdown
+                    </h3>
+                    <span class="text-xs text-slate-400 font-semibold" id="readiness-total-topics">Total MBBS 1st Year Topics: 0</span>
+                </div>
+                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden flex">
+                    <div id="bar-mastered" class="bg-emerald-500 h-full" style="width: 0%"></div>
+                    <div id="bar-retention" class="bg-sky-500 h-full" style="width: 0%"></div>
+                    <div id="bar-unlearned" class="bg-slate-800 h-full" style="width: 100%"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div class="bg-purple-950/20 border border-purple-900/40 rounded-xl p-4 text-center">
+                        <div class="text-3xl font-extrabold text-white" id="count-mastered">0</div>
+                        <div class="text-[11px] text-slate-400 mt-1">Mastered (<span id="pct-mastered">0</span>%)</div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-center">
+                        <div class="text-3xl font-extrabold text-white" id="count-retention">0</div>
+                        <div class="text-[11px] text-slate-400 mt-1">In Retention Cycle (<span id="pct-retention">0</span>%)</div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 text-center">
+                        <div class="text-3xl font-extrabold text-white" id="count-unlearned">0</div>
+                        <div class="text-[11px] text-slate-400 mt-1">Unlearned (<span id="pct-unlearned">0</span>%)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> Scheduled Assessments & Professional Exams
+                    </h3>
+                    <span class="text-xs text-slate-500">Countdowns update every second</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="exams-container">
+                </div>
+            </div>
+        </section>
+    </main>
+    <div id="add-topic-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-dark w-full max-w-md rounded-3xl p-6 border border-slate-700 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white">Add Curriculum Topic</h3>
+                <button onclick="closeModal('add-topic-modal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="add-topic-form" onsubmit="handleAddTopic(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Subject</label>
+                    <select id="topic-subject-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                        <option value="Anatomy">Anatomy</option>
+                        <option value="Physiology">Physiology</option>
+                        <option value="Biochemistry">Biochemistry</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Chapter Name</label>
+                    <input type="text" id="topic-chapter-input" required placeholder="e.g. Upper Limb & Pectoral Region" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Topic Name</label>
+                    <input type="text" id="topic-name-input" required placeholder="e.g. Brachial Plexus & Branches" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Initial Mastery Rating (Schedules First Revision)</label>
+                    <select id="topic-mastery-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                        <option value="poor">Poor — Later today (re-learn session)</option>
+                        <option value="average">Average — Tomorrow (1 day)</option>
+                        <option value="good" selected>Good — After 3 days</option>
+                        <option value="perfect">Perfect — After 4 days</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-2">
+                    <button type="button" onclick="closeModal('add-topic-modal')" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-teal-300 hover:bg-teal-200 text-slate-950 font-bold py-2.5 rounded-xl text-xs">Add Topic</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="review-topic-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-dark w-full max-w-md rounded-3xl p-6 border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <span class="text-[10px] font-bold text-teal-400 uppercase tracking-widest" id="modal-review-subject">Anatomy</span>
+                    <h3 class="font-bold text-lg text-white" id="modal-review-topic-name">Brachial Plexus</h3>
+                </div>
+                <button onclick="closeModal('review-topic-modal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="text-xs text-slate-400 bg-slate-950/80 p-3 rounded-xl border border-slate-800/80">
+                Current Interval: <strong class="text-white" id="modal-review-current-interval">3 days</strong>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-slate-300 block">How well did you retain it during active recall?</label>
+                <div class="space-y-2">
+                    <button onclick="submitReview('poor')" class="w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-rose-500/50 hover:bg-rose-950/20 transition flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-rose-400">Poor (×0.4)</div>
+                            <div class="text-[10px] text-slate-400">Struggled to recall material or key concepts</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 group-hover:text-rose-400"></i>
+                    </button>
+                    <button onclick="submitReview('average')" class="w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/50 hover:bg-amber-950/20 transition flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-amber-400">Average (×0.7)</div>
+                            <div class="text-[10px] text-slate-400">Remembered main ideas with gaps or hints</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 group-hover:text-amber-400"></i>
+                    </button>
+                    <button onclick="submitReview('good')" class="w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500/50 hover:bg-sky-950/20 transition flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-sky-400">Good (×1.7)</div>
+                            <div class="text-[10px] text-slate-400">Recalled most important ideas confidently</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 group-hover:text-sky-400"></i>
+                    </button>
+                    <button onclick="submitReview('perfect')" class="w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-950/20 transition flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-emerald-400">Perfect (×2.5)</div>
+                            <div class="text-[10px] text-slate-400">Accurate, independent, & effortless recall</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 group-hover:text-emerald-400"></i>
+                    </button>
+                    <button onclick="submitReview('skip')" class="w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-600 hover:bg-slate-800/40 transition flex items-center justify-between group">
+                        <div>
+                            <div class="text-xs font-bold text-slate-400">Skip (No Change)</div>
+                            <div class="text-[10px] text-slate-500">Busy / postponed — reschedule for next session</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 group-hover:text-slate-400"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="add-exam-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-dark w-full max-w-md rounded-3xl p-6 border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white">Add Scheduled Exam Target</h3>
+                <button onclick="closeModal('add-exam-modal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="add-exam-form" onsubmit="handleAddExam(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Subject Scope Tag</label>
+                    <input type="text" id="exam-tag-input" required placeholder="e.g. HUMAN ANATOMY or ALL 3 SUBJECTS" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Exam Title</label>
+                    <input type="text" id="exam-title-input" required placeholder="e.g. 1st Internal Assessment" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Date</label>
+                    <input type="date" id="exam-date-input" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Target Goal Score</label>
+                    <input type="text" id="exam-goal-input" required placeholder="e.g. > 70% or Distinction (>75%)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div class="pt-4 flex gap-2">
+                    <button type="button" onclick="closeModal('add-exam-modal')" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-rose-500 hover:bg-rose-400 text-white font-bold py-2.5 rounded-xl text-xs">Save Exam</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="log-session-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="card-dark w-full max-w-md rounded-3xl p-6 border border-slate-700 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white">Log Study / Practice Session</h3>
+                <button onclick="closeModal('log-session-modal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="log-session-form" onsubmit="handleLogSession(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Framework / Module</label>
+                    <select id="session-module-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                        <option value="SIR">S-I-R Framework</option>
+                        <option value="Interleaving">Interleaving</option>
+                        <option value="Marginal Gains">Marginal Gains Framework</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Session Type</label>
+                    <select id="session-type-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                        <option value="theory">Theory / Video Learning</option>
+                        <option value="practice">Deliberate Practice</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-300 block mb-1">Duration (Minutes)</label>
+                    <input type="number" id="session-mins-input" required min="1" placeholder="e.g. 45" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                </div>
+                <div class="pt-4 flex gap-2">
+                    <button type="button" onclick="closeModal('log-session-modal')" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-sky-500 hover:bg-sky-400 text-white font-bold py-2.5 rounded-xl text-xs">Log Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="assessment-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+        <div class="card-dark w-full max-w-3xl max-h-[90vh] rounded-3xl p-6 border border-slate-700 shadow-2xl flex flex-col justify-between animate-in fade-in zoom-in duration-200">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800 shrink-0">
+                <div>
+                    <span class="text-[10px] font-bold uppercase text-purple-400 tracking-wider">ICS Diagnostic Assessment</span>
+                    <h3 class="font-extrabold text-xl text-white">Evaluate Your Learning Profile</h3>
+                </div>
+                <button onclick="closeModal('assessment-modal')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="assessment-questions-container" class="overflow-y-auto my-4 pr-2 space-y-6 text-xs text-slate-200">
+            </div>
+            <div class="pt-4 border-t border-slate-800 flex justify-between items-center shrink-0">
+                <span class="text-[11px] text-slate-400">Answer all 30 questions to recalculate your skill radar.</span>
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeModal('assessment-modal')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-2.5 rounded-xl text-xs">Cancel</button>
+                    <button type="button" onclick="submitAssessment()" class="bg-purple-500 hover:bg-purple-400 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-lg shadow-purple-500/20">Submit & Calculate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/state.js"></script>
+    <script src="js/assessment.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/curriculum.js"></script>
+    <script src="js/ics.js"></script>
+    <script src="js/exams.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
